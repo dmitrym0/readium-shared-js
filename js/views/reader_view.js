@@ -46,6 +46,7 @@ ReadiumSDK.Views.ReaderView = function(options) {
     var _currentView = undefined;
     var _package = undefined;
     var _spine = undefined;
+    var _cachedViews = [];
     var _viewerSettings = new ReadiumSDK.Models.ViewerSettings({});
     //styles applied to the container divs
     var _userStyles = new ReadiumSDK.Collections.StyleCollection();
@@ -126,25 +127,34 @@ ReadiumSDK.Views.ReaderView = function(options) {
      * @returns {ReaderView.ViewType}
      */
     this.getCurrentViewType = function() {
+        return this.viewTypeForView(this._currentView);
+    };
 
-        if(!_currentView) {
+    this.viewTypeForView = function(view) {
+
+        if(!view) {
             return undefined;
         }
 
-        if(_currentView instanceof ReadiumSDK.Views.ReflowableView) {
+        if(view instanceof ReadiumSDK.Views.ReflowableView) {
             return ReadiumSDK.Views.ReaderView.VIEW_TYPE_COLUMNIZED;
         }
 
-        if(_currentView instanceof ReadiumSDK.Views.FixedView) {
+        if(view instanceof ReadiumSDK.Views.FixedView) {
             return ReadiumSDK.Views.ReaderView.VIEW_TYPE_FIXED;
         }
 
-        if(_currentView instanceof ReadiumSDK.Views.ScrollView) {
-            if(_currentView.isContinuousScroll()) {
+        if(view instanceof ReadiumSDK.Views.ScrollView) {
+            if(view.isContinuousScroll()) {
                 return ReadiumSDK.Views.ReaderView.VIEW_TYPE_SCROLLED_CONTINUOUS;
             }
 
             return ReadiumSDK.Views.ReaderView.VIEW_TYPE_SCROLLED_DOC;
+        }
+
+        if(view instanceof ReadiumSDK.Views.FallbackScrollView) {
+            // fake a columnized view because it's a fallback of it
+            return ReadiumSDK.Views.ReaderView.VIEW_TYPE_COLUMNIZED;
         }
 
         console.error("Unrecognized view type");
@@ -180,30 +190,11 @@ ReadiumSDK.Views.ReaderView = function(options) {
         return ReadiumSDK.Views.ReaderView.VIEW_TYPE_COLUMNIZED;
     }
 
-    // returns true is view changed
-    function initViewForItem(spineItem, callback) {
 
+    function createViewForItem(spineItem, callback) {
+        var view = undefined;
         var desiredViewType = deduceDesiredViewType(spineItem);
 
-        if(_currentView) {
-
-            if(self.getCurrentViewType() == desiredViewType) {
-                callback(false);
-                return;
-            }
-
-            resetCurrentView();
-        }
-
-        /**
-         * View creation options
-         * @typedef {object} ReadiumSDK.Views.ReaderView.ViewCreationOptions
-         * @property {jQueryElement} $viewport  The view port element the reader view has created.
-         * @property {ReadiumSDK.Models.Spine} spine The spine item collection object
-         * @property {ReadiumSDK.Collections.StyleCollection} userStyles User styles
-         * @property {ReadiumSDK.Collections.StyleCollection} bookStyles Book styles
-         * @property {ReadiumSDK.Views.IFrameLoader} iframeLoader   An instance of an iframe loader or one expanding it.
-         */
         var viewCreationParams = {
             $viewport: _$el,
             spine: _spine,
@@ -213,8 +204,72 @@ ReadiumSDK.Views.ReaderView = function(options) {
         };
 
 
-        _currentView = self.createViewForType(desiredViewType, viewCreationParams);
-        self.trigger(ReadiumSDK.Events.READER_VIEW_CREATED, desiredViewType);
+        view = self.createViewForType(desiredViewType, viewCreationParams);
+        return view;
+    }
+
+
+    function getCachedViewForSpineItem(spineItem) {
+        var cached = _.filter(_cachedViews, 
+            function(view) { 
+                return view.getLoadedContentFrames()[0].spineItem.index === spineItem.index;
+            });
+        return cached[0];
+    };
+
+
+    function createPrefetchedViewForSpineItemIndex(spineItemIndex) {
+        var spineItem = _spine.items[spineItemIndex];
+        var cachedView = getCachedViewForSpineItem(spineItem);
+        if (cachedView === undefined) {
+                var desiredViewType = deduceDesiredViewType(spineItem);
+
+                var viewCreationParams = {
+                    $viewport: _$el,
+                    spine: _spine,
+                    userStyles: _userStyles,
+                    bookStyles: _bookStyles,
+                    iframeLoader: _iframeLoader,
+                    cachedView: true
+                };
+
+                cachedView = self.createViewForType(desiredViewType, viewCreationParams);
+                var openPageRequest = new ReadiumSDK.Models.PageOpenRequest(spineItem, self);
+                openPageRequest.setFirstPage();
+
+                cachedView.render();
+                cachedView.openPage(openPageRequest,2);
+                cachedView.setViewSettings(_viewerSettings);
+        }
+        return cachedView;
+    };
+
+    // returns true is view changed
+    function initViewForItem(spineItem, callback) {
+        var cachedView = getCachedViewForSpineItem(spineItem);
+
+
+        _cachedViews.push(createPrefetchedViewForSpineItemIndex(spineItem.index+1));
+
+
+        // there's a cached view!
+        var newCurrentViewIsCached = false;
+        if (!(cachedView === undefined)) {
+            _currentView.hide();
+            _currentView.setCached(true);
+            cachedView.show();
+            cachedView.setCached(false);
+            newCurrentViewIsCached = true;
+            _currentView = cachedView;
+        }
+
+
+
+        if (!newCurrentViewIsCached) {
+            _currentView = createViewForItem(spineItem);
+        }
+
+        self.trigger(ReadiumSDK.Events.READER_VIEW_CREATED, self.viewTypeForView(_currentView));
 
         _currentView.on(ReadiumSDK.Events.CONTENT_DOCUMENT_LOADED, function($iframe, spineItem) {
 
@@ -251,8 +306,19 @@ ReadiumSDK.Views.ReaderView = function(options) {
             self.trigger(ReadiumSDK.Events.FXL_VIEW_RESIZED);
         })
 
-        _currentView.render();
-        _currentView.setViewSettings(_viewerSettings);
+        _currentView.on(ReadiumSDK.Events.CONTENT_DOCUMENT_LOAD_START, function($iframe, spineItem) {
+            self.trigger(ReadiumSDK.Events.CONTENT_DOCUMENT_LOAD_START, $iframe, spineItem);
+        });
+
+        if (!newCurrentViewIsCached) {
+            _currentView.render(); 
+            _currentView.setViewSettings(_viewerSettings);
+
+        } else {
+            _currentView.setViewSettings(_viewerSettings);
+            var spineAndIframe = _currentView.getLoadedContentFrames()[0];
+            _currentView.trigger(ReadiumSDK.Events.CONTENT_DOCUMENT_LOADED,spineAndIframe.$iframe, spineAndIframe.spineItem);
+        }
 
         // we do this to wait until elements are rendered otherwise book is not able to determine view size.
         setTimeout(function(){
@@ -728,6 +794,11 @@ ReadiumSDK.Views.ReaderView = function(options) {
 
     // dir: 0 => new or same page, 1 => previous, 2 => next
     function openPage(pageRequest, dir) {
+
+        // 1. check if a spine item is already cached, if so, set the current view to it
+        //    and cache around it.
+        // 2. if the spine item is not cached, do the normal thing.
+
 
         initViewForItem(pageRequest.spineItem, function(isViewChanged){
 
