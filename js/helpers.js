@@ -321,6 +321,10 @@ ReadiumSDK.Helpers.deduceSyntheticSpread = function($viewport, spineItem, settin
 
     //http://www.idpf.org/epub/fxl/#property-spread-values
 
+    if (settings === undefined) {
+        return false;
+    }
+
     var rendition_spread = spineItem ? spineItem.getRenditionSpread() : undefined;
 
     if(rendition_spread === ReadiumSDK.Models.SpineItem.RENDITION_SPREAD_NONE) {

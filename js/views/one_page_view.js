@@ -33,7 +33,7 @@
  * @param enableBookStyleOverrides
  * @constructor
  */
-ReadiumSDK.Views.OnePageView = function(options, classes, enableBookStyleOverrides, reader){
+ReadiumSDK.Views.OnePageView = function(options, classes, enableBookStyleOverrides, reader, cached){
 
     _.extend(this, Backbone.Events);
 
@@ -46,7 +46,7 @@ ReadiumSDK.Views.OnePageView = function(options, classes, enableBookStyleOverrid
     var _spine = options.spine;
     var _iframeLoader = options.iframeLoader;
     var _bookStyles = options.bookStyles;
-
+    var _cached = cached;
     var _$viewport = options.$viewport;
     
     var _isIframeLoaded = false;
@@ -444,6 +444,10 @@ ReadiumSDK.Views.OnePageView = function(options, classes, enableBookStyleOverrid
     var _useCSSTransformToHideIframe = true;
 
     this.showIFrame = function() {
+
+        if (_cached) {
+            return;
+        }
 
         _$iframe.css("visibility", "visible");
         
@@ -951,6 +955,16 @@ ReadiumSDK.Views.OnePageView = function(options, classes, enableBookStyleOverrid
         }
         return undefined;
     }
+
+    this.iframe = function () {
+        return _$iframe;
+    }
+
+
+    this.setCached = function(isCached) {
+        _cached = isCached;
+    };
+
 };
 
 ReadiumSDK.Views.OnePageView.SPINE_ITEM_OPEN_START = "SpineItemOpenStart";
