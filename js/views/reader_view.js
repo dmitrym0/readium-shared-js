@@ -257,6 +257,7 @@ ReadiumSDK.Views.ReaderView = function(options) {
             cachedView.setViewSettings(_viewerSettings);
             cachedView.openPage(openPageRequest,2);
             cachedView.setCached(true);
+            cachedView.hide();
         }
         return cachedView;
     };
@@ -290,7 +291,9 @@ ReadiumSDK.Views.ReaderView = function(options) {
                         console.log('%c View loaded in the background...%d cached views', 'background: grey; color: blue', _cachedViews.length);
                         _cachedViews.push(view);    
                     } else {
-                        console.debug('%c Prevented from loading duplicate view...%d cached views', 'background: grey; color: red', _cachedViews.length);                        
+                        console.debug('%c Prevented from loading duplicate view...%d cached views', 'background: grey; color: red', _cachedViews.length);
+                        view.hide();
+                        delete view;
                     }
                 })
             };
@@ -380,6 +383,11 @@ ReadiumSDK.Views.ReaderView = function(options) {
         setTimeout(function(){
 
             callback(true);
+            _.each(_cachedViews, function(view) {
+                if (view !== _currentView) {
+                    view.hide();
+                }
+            });
 
         }, 50);
 
