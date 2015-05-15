@@ -266,7 +266,7 @@ ReadiumSDK.Views.ReaderView = function(options) {
         if (_currentView) {
             _currentView.hide();
             _currentView.setCached(true);
-
+            _currentView.off();
         }
 
         var cachedView = getCachedViewForSpineItem(spineItem);
