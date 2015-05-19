@@ -264,6 +264,7 @@ ReadiumSDK.Views.ReaderView = function(options) {
 
     // returns true is view changed
     function initViewForItem(spineItem, callback) {
+        console.log('%c Init view for item', 'background: black; color: red');
         if (_currentView) {
             _currentView.hide();
             _currentView.setCached(true);
@@ -292,7 +293,9 @@ ReadiumSDK.Views.ReaderView = function(options) {
                         _cachedViews.push(view);    
                     } else {
                         console.debug('%c Prevented from loading duplicate view...%d cached views', 'background: grey; color: red', _cachedViews.length);
+                        console.debug("fixed-book-frame:", $('.fixed-book-frame', _$el).length);
                         view.hide();
+                        view.remove();
                         delete view;
                     }
                 })
@@ -301,12 +304,12 @@ ReadiumSDK.Views.ReaderView = function(options) {
             var rightSpineItemToPrefetch = _spine.items[spineItem.index + spinesWithinTheCurrentView];
             var leftSpineItemToPrefetch = _spine.items[spineItem.index - spinesWithinTheCurrentView];
 
-            if (rightSpineItemToPrefetch.index < _spine.items.length && _.isUndefined(getCachedViewForSpineItem(rightSpineItemToPrefetch))) {
+            if (rightSpineItemToPrefetch && _.isUndefined(getCachedViewForSpineItem(rightSpineItemToPrefetch))) {
                 var rightView = createPrefetchedViewForSpineItemIndex(rightSpineItemToPrefetch.index);
                 saveViewOnceLoaded(rightView);
             }
 
-            if (leftSpineItemToPrefetch.index > 0 && _.isUndefined(getCachedViewForSpineItem(leftSpineItemToPrefetch))) {
+            if (leftSpineItemToPrefetch && _.isUndefined(getCachedViewForSpineItem(leftSpineItemToPrefetch))) {
                  var leftView = createPrefetchedViewForSpineItemIndex(leftSpineItemToPrefetch.index, "last");
                  saveViewOnceLoaded(leftView);
             }
