@@ -110,7 +110,7 @@ ReadiumSDK.Views.ReaderView = function(options) {
             bookStyles: _bookStyles,
             iframeLoader: _iframeLoader,
         };
-        _currentView = _viewManager.getViewForSpineItem(spineItem, _currentView, _viewerSettings, viewCreationParams);
+        _currentView = _viewManager.getViewForSpineItem(spineItem, _currentView, _viewerSettings, viewCreationParams, callback);
 
         self.trigger(ReadiumSDK.Events.READER_VIEW_CREATED, _viewManager.viewTypeForView(_currentView));
 
@@ -129,10 +129,6 @@ ReadiumSDK.Views.ReaderView = function(options) {
             ReadiumSDK.Models.Switches.apply(contentDoc);
 
             self.trigger(ReadiumSDK.Events.CONTENT_DOCUMENT_LOADED, $iframe, spineItem);
-
-            // if (_.isUndefined(getCachedViewForSpineItem(_currentView.getLoadedSpineItems()[0]))) {
-            //     _cachedViews.push(_currentView);
-            // }
         });
 
         _currentView.on(ReadiumSDK.Events.CONTENT_DOCUMENT_LOAD_START, function ($iframe, spineItem) {
