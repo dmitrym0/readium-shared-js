@@ -310,17 +310,17 @@ ReadiumSDK.Views.OnePageView = function(options, classes, enableBookStyleOverrid
         
         _$el.css("transform", "none");
     
-        var settings = reader.viewerSettings();
-        if (!settings || typeof settings.enableGPUHardwareAccelerationCSS3D === "undefined")
-        {
-            //defaults
-            settings = new ReadiumSDK.Models.ViewerSettings({});
-        }
-        if (settings.enableGPUHardwareAccelerationCSS3D) {
+        // var settings = reader.viewerSettings();
+        // if (!settings || typeof settings.enableGPUHardwareAccelerationCSS3D === "undefined")
+        // {
+        //     //defaults
+        //     settings = new ReadiumSDK.Models.ViewerSettings({});
+        // }
+        // if (settings.enableGPUHardwareAccelerationCSS3D) {
 
-            // This fixes rendering issues with WebView (native apps), which crops content embedded in iframes unless GPU hardware acceleration is enabled for CSS rendering.
-            _$el.css("transform", "translateZ(0)");
-        }
+        //     // This fixes rendering issues with WebView (native apps), which crops content embedded in iframes unless GPU hardware acceleration is enabled for CSS rendering.
+        //     _$el.css("transform", "translateZ(0)");
+        // }
     
         _$el.css("height", "100%");
         _$el.css("width", "100%");
@@ -566,7 +566,8 @@ ReadiumSDK.Views.OnePageView = function(options, classes, enableBookStyleOverrid
             enable3D = true;
         }
 
-        if (reader.needsFixedLayoutScalerWorkAround())
+        // if (reader.needsFixedLayoutScalerWorkAround())
+        if(false)
         {
             var css1 = ReadiumSDK.Helpers.CSSTransformString({scale : scale, enable3D: enable3D});
             _$epubHtml.css(css1);
