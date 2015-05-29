@@ -257,7 +257,7 @@ ReadiumSDK.Views.ReaderView = function(options) {
         
         _mediaOverlayDataInjector = new ReadiumSDK.Views.MediaOverlayDataInjector(_package.media_overlay, _mediaOverlayPlayer);
 
-        _viewManager = new ReadiumSDK.Models.CacheManager(_spine);
+        _viewManager = new ReadiumSDK.Models.ViewManager(_spine);
 
         resetCurrentView();
 
