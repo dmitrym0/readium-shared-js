@@ -31,7 +31,7 @@
  * @param options
  * @constructor
  */
-ReadiumSDK.Views.ReflowableView = function(options, reader){
+ReadiumSDK.Views.ReflowableView = function(options){
 
     _.extend(this, Backbone.Events);
 
@@ -86,8 +86,7 @@ ReadiumSDK.Views.ReflowableView = function(options, reader){
         _$el = $(template);
         _$viewport.append(_$el);
 
-        // var settings = reader.viewerSettings();
-        var settings;
+        var settings = options.settings;
         if (!settings || typeof settings.enableGPUHardwareAccelerationCSS3D === "undefined")
         {
             //defaults
