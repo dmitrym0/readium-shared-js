@@ -153,10 +153,10 @@ ReadiumSDK.Views.ReaderView = function(options) {
             self.trigger(ReadiumSDK.Events.CONTENT_DOCUMENT_LOAD_START, $iframe, spineItem);
         });
 
-        // we do this to wait until elements are rendered otherwise book is not able to determine view size.
-        setTimeout(function(){
-            callback(true);
-        }, 50);
+        // // we do this to wait until elements are rendered otherwise book is not able to determine view size.
+        // setTimeout(function(){
+        //     callback(true);
+        // }, 50);
 
     }
 
@@ -626,19 +626,13 @@ ReadiumSDK.Views.ReaderView = function(options) {
 
     // dir: 0 => new or same page, 1 => previous, 2 => next
     function openPage(pageRequest, dir) {
-
-        // 1. check if a spine item is already cached, if so, set the current view to it
-        //    and cache around it.
-        // 2. if the spine item is not cached, do the normal thing.
-
-
-        initViewForItem(pageRequest.spineItem, function(isViewChanged){
+        initViewForItem(pageRequest.spineItem, function(isViewChanged, newView){
 
             if(!isViewChanged) {
                 _currentView.setViewSettings(_viewerSettings);
             }
 
-            _currentView.openPage(pageRequest, dir);
+            newView.openPage(pageRequest, dir);
         });
     }
 
