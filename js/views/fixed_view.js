@@ -26,10 +26,9 @@
 /**
  * View for rendering fixed layout page spread
  * @param options
- * @param reader
  * @constructor
  */
-ReadiumSDK.Views.FixedView = function(options, reader){
+ReadiumSDK.Views.FixedView = function(options){
 
     _.extend(this, Backbone.Events);
 
@@ -67,7 +66,7 @@ ReadiumSDK.Views.FixedView = function(options, reader){
         var pageView = new ReadiumSDK.Views.OnePageView(options,
         [elementClass],
         false, //enableBookStyleOverrides
-        reader,
+        options.settings,
         _cached
         );
 

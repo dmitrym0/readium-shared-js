@@ -33,7 +33,7 @@
  * @param enableBookStyleOverrides
  * @constructor
  */
-ReadiumSDK.Views.OnePageView = function(options, classes, enableBookStyleOverrides, reader, cached){
+ReadiumSDK.Views.OnePageView = function(options, classes, enableBookStyleOverrides, settings, cached){
 
     _.extend(this, Backbone.Events);
 
@@ -52,6 +52,8 @@ ReadiumSDK.Views.OnePageView = function(options, classes, enableBookStyleOverrid
     var _isIframeLoaded = false;
 
     var _$scaler;
+
+    var _needsFixedLayoutScalerWorkAround = options.needsFixedLayoutScalerWorkAround || false;
 
     var PageTransitionHandler = function(opts)
     {
@@ -310,7 +312,6 @@ ReadiumSDK.Views.OnePageView = function(options, classes, enableBookStyleOverrid
         
         _$el.css("transform", "none");
     
-        var settings = reader.viewerSettings();
         if (!settings || typeof settings.enableGPUHardwareAccelerationCSS3D === "undefined")
         {
             //defaults
@@ -566,7 +567,7 @@ ReadiumSDK.Views.OnePageView = function(options, classes, enableBookStyleOverrid
             enable3D = true;
         }
 
-        if (reader.needsFixedLayoutScalerWorkAround())
+        if(_needsFixedLayoutScalerWorkAround)
         {
             var css1 = ReadiumSDK.Helpers.CSSTransformString({scale : scale, enable3D: enable3D});
             _$epubHtml.css(css1);

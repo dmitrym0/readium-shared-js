@@ -31,7 +31,7 @@
  * @param options
  * @constructor
  */
-ReadiumSDK.Views.ReflowableView = function(options, reader){
+ReadiumSDK.Views.ReflowableView = function(options){
 
     _.extend(this, Backbone.Events);
 
@@ -86,7 +86,7 @@ ReadiumSDK.Views.ReflowableView = function(options, reader){
         _$el = $(template);
         _$viewport.append(_$el);
 
-        var settings = reader.viewerSettings();
+        var settings = options.settings;
         if (!settings || typeof settings.enableGPUHardwareAccelerationCSS3D === "undefined")
         {
             //defaults
@@ -577,7 +577,7 @@ ReadiumSDK.Views.ReflowableView = function(options, reader){
 // console.debug(fontSize);
 //         }
         
-        if (_viewSettings.fontSize)
+        // if (_viewSettings.fontSize)
         {
             var fontSizeAdjust = (_viewSettings.fontSize*0.8)/100;
             MAXW = Math.floor(MAXW * fontSizeAdjust);
