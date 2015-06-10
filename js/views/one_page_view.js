@@ -53,6 +53,8 @@ ReadiumSDK.Views.OnePageView = function(options, classes, enableBookStyleOverrid
 
     var _$scaler;
 
+    var _needsFixedLayoutScalerWorkAround = options.needsFixedLayoutScalerWorkAround || false;
+
     var PageTransitionHandler = function(opts)
     {
         var PageTransition = function(begin, end)
@@ -565,8 +567,7 @@ ReadiumSDK.Views.OnePageView = function(options, classes, enableBookStyleOverrid
             enable3D = true;
         }
 
-        // if (reader.needsFixedLayoutScalerWorkAround())
-        if(false)
+        if(_needsFixedLayoutScalerWorkAround)
         {
             var css1 = ReadiumSDK.Helpers.CSSTransformString({scale : scale, enable3D: enable3D});
             _$epubHtml.css(css1);
