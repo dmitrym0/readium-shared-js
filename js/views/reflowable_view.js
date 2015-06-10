@@ -577,7 +577,7 @@ ReadiumSDK.Views.ReflowableView = function(options){
 // console.debug(fontSize);
 //         }
         
-        // if (_viewSettings.fontSize)
+        if (_viewSettings.fontSize)
         {
             var fontSizeAdjust = (_viewSettings.fontSize*0.8)/100;
             MAXW = Math.floor(MAXW * fontSizeAdjust);
