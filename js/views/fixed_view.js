@@ -42,7 +42,7 @@ ReadiumSDK.Views.FixedView = function(options){
     var _zoom = options.zoom || {style: 'default'};
     var _currentScale;
     var _iframeLoader = options.iframeLoader;
-    var _viewSettings = undefined;
+    var _viewSettings = options.viewSettings;
 
     var _cached = options.cachedView || false;
 
