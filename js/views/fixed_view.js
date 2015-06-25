@@ -66,7 +66,7 @@ ReadiumSDK.Views.FixedView = function(options){
         var pageView = new ReadiumSDK.Views.OnePageView(options,
         [elementClass],
         false, //enableBookStyleOverrides
-        options.settings,
+        _viewSettings,
         _cached
         );
 
