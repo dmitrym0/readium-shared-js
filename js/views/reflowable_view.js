@@ -901,10 +901,6 @@ ReadiumSDK.Views.ReflowableView = function(options){
         self.openPage(openPageRequest);
     }
 
-    this.getLoadedContentFrames = function () {
-        return [{spineItem: _currentSpineItem, $iframe: _$iframe}];
-    };
-
     this.hide = function() {
         _$el.hide();
     };
