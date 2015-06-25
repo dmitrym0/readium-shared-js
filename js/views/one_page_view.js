@@ -957,11 +957,6 @@ ReadiumSDK.Views.OnePageView = function(options, classes, enableBookStyleOverrid
         return undefined;
     }
 
-    this.iframe = function () {
-        return _$iframe;
-    }
-
-
     this.setCached = function(isCached) {
         _cached = isCached;
     };
