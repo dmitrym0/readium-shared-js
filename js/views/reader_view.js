@@ -88,9 +88,10 @@ ReadiumSDK.Views.ReaderView = function(options) {
     /**
      * @returns {boolean}
      */
-    this.needsFixedLayoutScalerWorkAround = function() { return _needsFixedLayoutScalerWorkAround; }
+    this.needsFixedLayoutScalerWorkAround = function() {
+      return _needsFixedLayoutScalerWorkAround;
+    };
 
- 
     /**
      * Returns the current view type of the reader view
      * @returns {ReaderView.ViewType}
@@ -148,7 +149,7 @@ ReadiumSDK.Views.ReaderView = function(options) {
 
         _currentView.on(ReadiumSDK.Events.FXL_VIEW_RESIZED, function(){
             self.trigger(ReadiumSDK.Events.FXL_VIEW_RESIZED);
-        })
+        });
 
         _currentView.on(ReadiumSDK.Events.CONTENT_DOCUMENT_LOAD_START, function($iframe, spineItem) {
             self.trigger(ReadiumSDK.Events.CONTENT_DOCUMENT_LOAD_START, $iframe, spineItem);
@@ -483,7 +484,7 @@ ReadiumSDK.Views.ReaderView = function(options) {
 
         var paginationInfo = _currentView.getPaginationInfo();
 
-        if(paginationInfo.openPages.length == 0) {
+        if(paginationInfo.openPages.length === 0) {
             return;
         }
 
@@ -520,7 +521,7 @@ ReadiumSDK.Views.ReaderView = function(options) {
 
         var paginationInfo = _currentView.getPaginationInfo();
 
-        if(paginationInfo.openPages.length == 0) {
+        if(paginationInfo.openPages.length === 0) {
             return;
         }
 
